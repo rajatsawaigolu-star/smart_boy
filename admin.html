@@ -1,18 +1,22 @@
+
 <!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Smart Cute Boy Admin</title>
-<style>body{background:#111;color:#fff;font-family:Arial;padding:20px;max-width:450px;margin:auto}input{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:0}button{width:100%;padding:14px;background:#ff0080;color:#fff;border:0;border-radius:10px;font-weight:700;font-size:16px}</style></head><body>
-<h2>SMART CUTE BOY - ADMIN</h2>
-<input id="title" placeholder="Video Title">
-<input id="thumb" placeholder="Thumbnail URL">
-<input id="video" placeholder="Full Video URL (mp4 / drive link)">
+<style>body{background:#111;color:#fff;font-family:Arial;padding:20px;max-width:450px;margin:auto}input{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:0}button{width:100%;padding:14px;background:#ff0080;color:#fff;border:0;border-radius:10px;font-weight:800}</style></head><body>
+<h2>SMART CUTE BOY - ADMIN (Fixed)</h2>
+<input id="title" placeholder="Title" value="Please watch my Full Video">
+<input id="thumb" placeholder="Thumbnail Direct Link - https://i.postimg.cc/...jpg">
+<input id="video" placeholder="Video Direct Link - https://files.catbox.moe/....mp4">
 <button onclick="save()">SAVE VIDEO</button>
-<p id="msg"></p>
+<p id="msg" style="text-align:center"></p>
 <script>
-const BACKEND="https://viewpoint-pay-backend.onrender.com";
-const VIDEO_ID="smart-cute-boy-1";
-async function save(){
-  const data={id:VIDEO_ID,title:document.getElementById('title').value,thumbnail:document.getElementById('thumb').value,videoUrl:document.getElementById('video').value};
-  const res=await fetch(BACKEND+'/api/save-video',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-  const j=await res.json();
-  document.getElementById('msg').innerText=j.success?"Saved! Website lo update ayyindi":"Error: "+JSON.stringify(j);
+function save(){
+  const t=document.getElementById('title').value;
+  const th=document.getElementById('thumb').value;
+  const v=document.getElementById('video').value;
+  if(!th || !v){alert('Thumbnail and Video Link pettali bro!');return;}
+  localStorage.setItem('scb_title',t);
+  localStorage.setItem('scb_thumb',th);
+  localStorage.setItem('scb_video',v);
+  document.getElementById('msg').innerHTML='✅ SAVED! <br><br>Main site open chey:<br>https://rajatsawaigolu-star.github.io/smart_boy/';
+  alert('Saved! Ippudu main site open chey bro');
 }
 </script></body></html>
