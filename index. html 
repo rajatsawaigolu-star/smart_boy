@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Cute Boy - Official</title>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;text-align:center}
+.banner{width:100%;height:220px;background:linear-gradient(45deg,#ff0080,#7928ca);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;letter-spacing:2px}
+.card{max-width:420px;margin:-60px auto 20px;background:#fff;color:#000;border-radius:20px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+.thumb{width:100%;border-radius:14px}
+.title{font-size:20px;font-weight:700;margin:12px 0}
+.price{font-size:24px;font-weight:900}
+.btn{background:#000;color:#fff;width:100%;padding:15px;border:0;border-radius:12px;font-size:18px;margin-top:12px}
+.videoBox{display:none;margin-top:15px}
+</style>
+</head>
+<body>
+<div class="banner">SMART CUTE BOY</div>
+<div class="card">
+<img id="thumb" class="thumb" src="https://via.placeholder.com/400x220?text=Smart+Cute+Boy">
+<div class="title" id="vTitle">Smart Cute Boy - Full Video</div>
+<div class="price">₹20</div>
+<button class="btn" id="payBtn">Pay ₹20 & Watch</button>
+<div class="videoBox" id="vBox">
+<video id="vPlayer" controls width="100%"></video>
+</div>
+<p style="font-size:11px;color:#777">Payment verified tarvata video open avutundi</p>
+</div>
+<script>
+const BACKEND="https://viewpoint-pay-backend.onrender.com";
+const VIDEO_ID="smart-cute-boy-1";
+async function load(){
+ try{
+  const r=await fetch(BACKEND+"/api/get-video?id="+VIDEO_ID);
+  const d=await r.json();
+  if(d.title){document.getElementById('vTitle').innerText=d.title;document.getElementById('thumb').src=d.thumbnail;document.getElementById('vPlayer').src=d.videoUrl;}
+ }catch(e){}
+}
+load();
+document.getElementById('payBtn').onclick=async function(){
+ const oR=await fetch(BACKEND+'/api/create-order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:2000,videoId:VIDEO_ID})});
+ const oD=await oR.json();
+ if(!oD.id){alert("Backend lo /api/create-order ledu - cheppu nenu code ista");return;}
+ var opt={key:oD.key_id,amount:"2000",currency:"INR",name:"Smart Cute Boy",description:"Full Video",order_id:oD.id,
+ handler:async function(res){
+  const vR=await fetch(BACKEND+'/api/verify-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({razorpay_order_id:res.razorpay_order_id,razorpay_payment_id:res.razorpay_payment_id,razorpay_signature:res.razorpay_signature,videoId:VIDEO_ID})});
+  const vD=await vR.json();
+  if(vD.verified){document.getElementById('vBox').style.display='block';document.getElementById('vPlayer').play();alert("Payment Success - Video Unlocked!");}
+  else{alert("Verify failed");}
+ },theme:{color:"#000"}};
+ var rzp=new Razorpay(opt);rzp.open();
+}
+</script>
+</body>
+</html>
