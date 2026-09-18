@@ -1,103 +1,34 @@
-<!DOCTYPE html>
-<html lang="te">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Cute Boy - Official Video</title>
+<!DOCTYPE html><html lang="te"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Smart Cute Boy - Official Video</title>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;text-align:center}
-.banner{width:100%;height:230px;background:linear-gradient(45deg,#ff0080,#7928ca);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;letter-spacing:2px}
-.card{max-width:430px;margin:-65px auto 30px;background:#fff;color:#000;border-radius:22px;padding:20px;box-shadow:0 12px 35px rgba(0,0,0,.4)}
-.thumb{width:100%;border-radius:14px}
-.title{font-size:21px;font-weight:800;margin:14px 0 6px}
-.desc{font-size:13px;color:#555;margin-bottom:10px}
-.price{font-size:26px;font-weight:900;margin:8px 0}
-.btn{background:#000;color:#fff;width:100%;padding:16px;border:0;border-radius:14px;font-size:18px;font-weight:700}
-.videoBox{display:none;margin-top:16px;text-align:left}
-video{width:100%;border-radius:12px;background:#000}
-.note{font-size:11px;color:#888;margin-top:8px}
-</style>
-</head>
-<body>
-
+<style>*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;text-align:center}.banner{width:100%;height:230px;background:linear-gradient(45deg,#ff0080,#7928ca);display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900}.card{max-width:430px;margin:-65px auto 30px;background:#fff;color:#000;border-radius:22px;padding:20px;box-shadow:0 12px 35px rgba(0,0,0,.4)}.thumb{width:100%;border-radius:14px}.title{font-size:21px;font-weight:800;margin:14px 0 6px}.desc{font-size:13px;color:#555;margin-bottom:12px}.btn{width:100%;padding:15px;background:#ff0080;color:#fff;border:0;border-radius:12px;font-size:18px;font-weight:800}video{width:100%;border-radius:12px;display:none;margin-top:12px}</style></head><body>
 <div class="banner">SMART CUTE BOY</div>
-
 <div class="card">
-<img id="thumb" class="thumb" src="https://via.placeholder.com/430x230?text=SMART+CUTE+BOY">
-<div class="title" id="vTitle">Smart Cute Boy - Full Private Video</div>
-<div class="desc">Full video chudali ante ₹20 pay cheyandi</div>
-<div class="price">₹20 Only</div>
-<button class="btn" id="payBtn">Pay ₹20 & Watch Now</button>
-
-<div class="videoBox" id="vBox">
-<h3 style="margin:10px 0">🔓 Unlocked Video</h3>
-<video id="vPlayer" controls controlsList="nodownload" playsinline></video>
+<img id="thumb" class="thumb" src="https://via.placeholder.com/400x220?text=Upload+Thumbnail+in+Admin">
+<div id="title" class="title">Please watch my Full Video</div>
+<div class="desc">Watch full video in HD - Just ₹20</div>
+<button id="payBtn" class="btn" onclick="pay()">🔓 Pay ₹20 to Unlock Full Video</button>
+<video id="video" controls></video>
 </div>
-<div class="note">Payment verified tarvata matrame video play avutundi</div>
-</div>
-
 <script>
-const BACKEND = "https://viewpoint-pay-backend.onrender.com";
-const VIDEO_ID = "smart-cute-boy-1";
-
-async function loadVideo(){
-  try{
-    const res = await fetch(BACKEND+'/api/get-video?id='+VIDEO_ID);
-    const data = await res.json();
-    if(data && data.title){
-      document.getElementById('vTitle').innerText = data.title;
-      document.getElementById('thumb').src = data.thumbnail;
-      document.getElementById('vPlayer').src = data.videoUrl;
-    }
-  }catch(e){ console.log("Backend nundi raaledu, default thumbnail"); }
+const defThumb="https://via.placeholder.com/400x220?text=Smart+Cute+Boy";
+const defVideo="";
+function load(){
+  const t=localStorage.getItem('scb_title');
+  const th=localStorage.getItem('scb_thumb');
+  const v=localStorage.getItem('scb_video');
+  if(t) document.getElementById('title').innerText=t;
+  if(th) document.getElementById('thumb').src=th;
+  if(v) document.getElementById('video').src=v;
 }
-loadVideo();
-
-document.getElementById('payBtn').onclick = async function(){
-  try{
-    const orderRes = await fetch(BACKEND+'/api/create-order',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({amount:2000, videoId:VIDEO_ID})
-    });
-    const orderData = await orderRes.json();
-    if(!orderData.id){ alert("Order create kaledu - Backend /api/create-order check chey bro"); return; }
-
-    var options = {
-      "key": orderData.key_id,
-      "amount": "2000",
-      "currency": "INR",
-      "name": "Smart Cute Boy",
-      "description": "Full Video Access",
-      "order_id": orderData.id,
-      "handler": async function (response){
-        const verifyRes = await fetch(BACKEND+'/api/verify-payment',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            videoId: VIDEO_ID
-          })
-        });
-        const verifyData = await verifyRes.json();
-        if(verifyData.verified){
-          document.getElementById('vBox').style.display='block';
-          document.getElementById('vPlayer').play();
-          alert("Payment Success! Video Unlocked");
-        }else{
-          alert("Verification failed - Razorpay Dashboard lo Captured ayyinda chudu");
-        }
-      },
-      "theme":{"color":"#000000"}
-    };
-    var rzp = new Razorpay(options);
-    rzp.open();
-  }catch(err){ alert("Backend connect avvadu: "+err.message); }
+function pay(){
+  const vSrc=document.getElementById('video').src;
+  if(!vSrc || vSrc.includes('placeholder')){alert('Bro mundhu Admin lo Video Link save chey!');return;}
+  // Demo payment - direct unlock (Razorpay key add chesaka real payment vastundi)
+  if(confirm('Pay ₹20 to unlock? (Demo - OK nokithe video play avutundi)')){
+    document.getElementById('video').style.display='block';
+    document.getElementById('payBtn').innerText='✅ Unlocked - Enjoy!';
+    document.getElementById('video').play();
+  }
 }
-</script>
-</body>
-</html>
+load();
+</script></body></html>
