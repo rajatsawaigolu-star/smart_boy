@@ -1,80 +1,262 @@
-<!DOCTYPE html>  <html lang="en">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width,initial-scale=1">  
-<title>Smart Cute Boy - Official</title>  
-<style>  
-body {  
-  margin: 0;  
-  font-family: Arial, sans-serif;  
-  background: #0f0f0f;  
-  color: #fff;  
-  text-align: center;  
-}  
-.banner {  
-  width: 100%;  
-  min-height: 220px;  
-  background: linear-gradient(45deg,#ff0080,#7928ca);  
-  display: flex;  
-  align-items: center;  
-  justify-content: center;  
-  font-size: 32px;  
-  font-weight: 900;  
-}  
-.card {  
-  box-sizing: border-box;  
-  max-width: 430px;  
-  margin: -40px auto 20px;  
-  background: #fff;  
-  color: #000;  
-  border-radius: 22px;  
-  padding: 20px;  
-  box-shadow: 0 10px 30px rgba(0,0,0,.5);  
-}  
-.thumb {  
-  width: 100%;  
-  border-radius: 14px;  
-}  
-.title {  
-  font-size: 20px;  
-  font-weight: 800;  
-  margin: 12px 0;  
-}  
-.btn {  
-  display: block;  
-  box-sizing: border-box;  
-  width: 100%;  
-  padding: 15px;  
-  background: #ff0080;  
-  color: #fff;  
-  border: 0;  
-  border-radius: 12px;  
-  font-size: 18px;  
-  font-weight: 800;  
-  text-decoration: none;  
-}  
-.note {  
-  font-size: 13px;  
-  color: #666;  
-  margin-bottom: 12px;  
-  line-height: 1.5;  
-}  
-</style>  
-</head>  
-<body>  <div class="banner">SMART CUTE BOY</div>  <div class="card">  
-  <img class="thumb"  
-       src="https://files.catbox.moe/2bo2hk.jpg"  
-       alt="Video banner">    <div class="title">Please watch my Full Video</div>    <div class="note">  
-    Watch full video in HD — Just ₹20  
-  </div>  <a class="btn"  
-href="https://rzp.io/rzp/QwjHmvP"  
-target="_blank"  
-rel="noopener">
-🔓 Pay ₹20 to Continue
-</a>
 
-  <div class="note" style="margin-top:12px">  
-    After payment, access will be provided after payment verification.  
-  </div>  
-</div>  </body>  
-</html>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Cute Boy - Official</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f0f0f;
+  color: #fff;
+  text-align: center;
+}
+
+.banner {
+  width: 100%;
+  min-height: 220px;
+  background: linear-gradient(45deg,#ff0080,#7928ca);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.card {
+  max-width: 430px;
+  margin: -40px auto 20px;
+  background: #fff;
+  color: #000;
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5);
+}
+
+.thumb {
+  width: 100%;
+  border-radius: 14px;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 12px 0;
+}
+
+.btn {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  background: #ff0080;
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.note {
+  font-size: 13px;
+  color: #666;
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+#status {
+  color: #333;
+  font-size: 14px;
+  margin-top: 14px;
+  line-height: 1.5;
+}
+
+video {
+  width: 100%;
+  margin-top: 15px;
+  border-radius: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="banner">SMART CUTE BOY</div>
+
+<div class="card">
+
+  <img class="thumb"
+       src="https://files.catbox.moe/2bo2hk.jpg"
+       alt="Video banner">
+
+  <div class="title">Please Watch My Full Video</div>
+
+  <div class="note">
+    Watch full video in HD — Just ₹20
+  </div>
+
+  <button class="btn" id="payBtn">
+    🔓 Pay ₹20 to Watch
+  </button>
+
+  <div id="status">
+    Pay ₹20 to unlock your video.
+  </div>
+
+  <div id="videoBox" style="display:none;">
+    <h3>Welcome to Your Video! 🎉</h3>
+    <video id="videoPlayer" controls playsinline></video>
+  </div>
+
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+const API = "https://viewpoint-pay-backend.onrender.com";
+
+const payBtn = document.getElementById("payBtn");
+const statusBox = document.getElementById("status");
+const videoBox = document.getElementById("videoBox");
+const videoPlayer = document.getElementById("videoPlayer");
+
+// Keep access separately in this browser
+const savedVideo = localStorage.getItem("smart_boy_video_url");
+
+if (savedVideo) {
+  showVideo(savedVideo);
+}
+
+function showVideo(url) {
+  videoPlayer.src = url;
+  videoBox.style.display = "block";
+  payBtn.style.display = "none";
+  statusBox.textContent = "Payment successful. Enjoy your video!";
+}
+
+payBtn.addEventListener("click", async function () {
+  payBtn.disabled = true;
+  payBtn.textContent = "Please wait...";
+  statusBox.textContent = "Opening secure payment...";
+
+  try {
+    // 1. Create a new ₹20 order
+    const orderResponse = await fetch(API + "/api/create-order", {
+      method: "POST"
+    });
+
+    if (!orderResponse.ok) {
+      throw new Error("Could not create payment order.");
+    }
+
+    const order = await orderResponse.json();
+
+    // 2. Open Razorpay Checkout
+    const options = {
+      key: order.key_id,
+      amount: order.amount,
+      currency: "INR",
+      name: "Smart Cute Boy",
+      description: "Full Video Access",
+      order_id: order.order_id,
+
+      handler: async function (response) {
+        statusBox.textContent = "Payment received. Verifying...";
+
+        try {
+          // 3. Verify payment with backend
+          const verifyResponse = await fetch(
+            API + "/api/verify-payment",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(response)
+            }
+          );
+
+          const verified = await verifyResponse.json();
+
+          if (!verified.success || !verified.token) {
+            throw new Error("Payment verification failed.");
+          }
+
+          // 4. Unlock this payment's video
+          const unlockResponse = await fetch(
+            API + "/api/unlock-video",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                token: verified.token
+              })
+            }
+          );
+
+          const unlocked = await unlockResponse.json();
+
+          if (!unlocked.success || !unlocked.video) {
+            throw new Error("Video unlock failed.");
+          }
+
+          // 5. Save access in this browser
+          localStorage.setItem(
+            "smart_boy_video_url",
+            unlocked.video
+          );
+
+          showVideo(unlocked.video);
+
+        } catch (error) {
+          statusBox.textContent =
+            "Payment received, but video unlock failed. Please contact support.";
+          payBtn.style.display = "block";
+          payBtn.disabled = false;
+          payBtn.textContent = "Retry Video Unlock";
+        }
+      },
+
+      modal: {
+        ondismiss: function () {
+          statusBox.textContent =
+            "Payment cancelled. Please try again to watch this beautiful video.";
+          payBtn.disabled = false;
+          payBtn.textContent = "🔓 Pay ₹20 to Watch";
+        }
+      },
+
+      theme: {
+        color: "#ff0080"
+      }
+    };
+
+    const checkout = new Razorpay(options);
+
+    checkout.on("payment.failed", function () {
+      statusBox.textContent =
+        "Payment failed. Please try again to watch this beautiful video.";
+      payBtn.disabled = false;
+      payBtn.textContent = "🔓 Try Payment Again";
+    });
+
+    checkout.open();
+
+  } catch (error) {
+    statusBox.textContent =
+      "Something went wrong. Please try again.";
+    payBtn.disabled = false;
+    payBtn.textContent = "🔓 Try Payment Again";
+  }
+});
+</script>
+
+</body>
+</html>
