@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOWA - Smart Cute Boy</title>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0;padding:0;text-align:center}
+.banner{width:100%;height:200px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold}
+.card{max-width:400px;margin:-50px auto 20px;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.1);padding:16px}
+.thumb{width:100%;border-radius:12px}
+.price{font-size:22px;font-weight:bold;margin:10px 0}
+.paybtn{background:#000;color:#fff;border:0;padding:14px 20px;border-radius:10px;width:100%;font-size:18px}
+.videoBox{display:none;margin-top:20px}
+</style>
+</head>
+<body>
+
+<div class="banner" id="bannerText">NOWA</div>
+
+<div class="card">
+<img id="thumbImg" class="thumb" src="https://via.placeholder.com/400x220?text=Thumbnail" />
+<h2 id="videoTitle">How To Earn First ₹1000</h2>
+<div class="price">₹20</div>
+<button class="paybtn" id="payBtn">Pay ₹20 & Watch Full Video</button>
+
+<div class="videoBox" id="videoBox">
+<h3>Full Video</h3>
+<video id="fullVideo" controls width="100%"></video>
+</div>
+<p style="font-size:12px;color:#666">Payment verify ayyaka matrame video open avutundi</p>
+</div>
+
+<script>
+// ============ CONFIG - MARCHAKU ============
+const BACKEND = "https://viewpoint-pay-backend.onrender.com";
+const VIDEO_ID = "kerala-food"; // admin lo id
+
+// Page load ayyagane video details backend nundi techukovatam
+async function loadVideo(){
+  try{
+    const res = await fetch(BACKEND+'/api/get-video?id='+VIDEO_ID);
+    const data = await res.json();
+    if(data.title){
+      document.getElementById('videoTitle').innerText = data.title;
+      document.getElementById('thumbImg').src = data.thumbnail;
+      document.getElementById('bannerText').innerText = data.bannerText || 'NOWA';
+      document.getElementById('fullVideo').src = data.videoUrl;
+    }
+  }catch(e){console.log("Backend nundi data raledu, default chupistunna");}
+}
+loadVideo();
+
+// ============ RAZORPAY LIVE PAYMENT ============
+document.getElementById('payBtn').onclick = async function(){
+  // 1. Backend lo order create cheyali - 2000 paise = ₹20
+  const orderRes = await fetch(BACKEND+'/api/create-order',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({amount:2000, videoId: VIDEO_ID})
+  });
+  const orderData = await orderRes.json();
+  
+  if(!orderData.id){ alert("Order create kaledu - Backend check chey"); return; }
+
+  var options = {
+    "key": orderData.key_id, // Live Key ID backend nundi vastundi
+    "amount": "2000",
+    "currency": "INR",
+    "name": "NOWA",
+    "description": "Full Video Access",
+    "order_id": orderData.id,
+    "handler": async function (response){
+      // 2. Payment verify backend lo
+      const verifyRes = await fetch(BACKEND+'/api/verify-payment',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          videoId: VIDEO_ID
+        })
+      });
+      const verifyData = await verifyRes.json();
+      if(verifyData.verified === true){
+        document.getElementById('videoBox').style.display = 'block';
+        document.getElementById('fullVideo').play();
+        alert("Payment Verified - Video Unlock Ayindi!");
+      }else{
+        alert("Verification failed - Dashboard lo Captured ayyinda check chey");
+      }
+    },
+    "theme": {"color": "#000"}
+  };
+  var rzp = new Razorpay(options);
+  rzp.open();
+}
+</script>
+</body>
+</html>
